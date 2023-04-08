@@ -1,84 +1,51 @@
-const resultElement = document.getElementById("result");
-const lengthElement = document.getElementById("length");
-const uppercaseElement = document.getElementById("uppercase");
-const lowercaseElement = document.getElementById("lowercase");
-const numbersElement = document.getElementById("numbers");
-const symbolsElement = document.getElementById("symbols");
-const generateElement = document.getElementById("generate");
-const clipboardElement = document.getElementById("clipboard");
+// Get the elements from the DOM
+const birthdayInput = document.getElementById('birthday')
+const calculateButton = document.getElementById('calculate')
+const resultElement = document.getElementById('result')
 
-// Random functions
-// fromCharCode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode
-// ASCII codes: https://www.w3schools.com/charsets/ref_html_ascii.asp
-const getRandomLower = () =>
-  String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+// Add click event listener to the calculate button
+calculateButton.addEventListener('click', calculateAge)
 
-const getRandomUpper = () =>
-  String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+// Function to calculate the age
 
-const getRandomNumber = () =>
-  String.fromCharCode(Math.floor(Math.random() * 10) + 48);
+function calculateAge() {
+  // Get the value from the input
+  const birthday = birthdayInput.value
 
-const getRandomSymbol = () => {
-  const symbols = "!@#$%^&*(){}[]=<>/,.";
-  return symbols[Math.floor(Math.random() * symbols.length)];
-};
+  // Check if the value is empty
+  if (birthday === '') {
+    // If the value is empty, show an alert
+    alert('Please enter your birthday')
+  } else {
+    // If the value is not empty, calculate the age
+    const age = getAge(birthday)
 
-const randomFunctions = {
-  lower: getRandomLower,
-  upper: getRandomUpper,
-  number: getRandomSymbol,
-  symbol: getRandomSymbol,
-};
-
-const createNotification = (message) => {
-  const notif = document.createElement("div");
-  notif.classList.add("toast");
-  notif.innerText = message;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 3000);
-};
-
-clipboardElement.addEventListener("click", () => {
-  const password = resultElement.innerText;
-  if (!password) return;
-  const textarea = document.createElement("textarea");
-  textarea.value = password;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-  createNotification("Password copied to clipboard!");
-});
-
-generateElement.addEventListener("click", () => {
-  const length = +lengthElement.value;
-  const hasLower = lowercaseElement.checked;
-  const hasUpper = uppercaseElement.checked;
-  const hasNumber = numbersElement.checked;
-  const hasSymbol = symbolsElement.checked;
-  resultElement.innerText = generatePassword(
-    hasLower,
-    hasUpper,
-    hasNumber,
-    hasSymbol,
-    length
-  );
-});
-
-const generatePassword = (lower, upper, number, symbol, length) => {
-  let generatedPassword = "";
-  const typesCount = lower + upper + number + symbol;
-  const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(
-    (item) => Object.values(item)[0]
-  );
-  if (typesCount === 0) return "";
-  for (let i = 0; i < length; i += typesCount) {
-    typesArr.forEach((type) => {
-      const funcName = Object.keys(type)[0];
-      generatedPassword += randomFunctions[funcName]();
-    });
+    // Show the result
+    resultElement.innerHTML = `Your age is ${age} ${
+      age > 1 ? 'years' : 'year' // Check if the age is more than 1
+    } old`
   }
-  const finalPassword = generatedPassword.slice(0, length);
-  return finalPassword;
-};
+}
+
+// Function to calculate the age
+function getAge(birthDay) {
+  // Get the current date
+  const currentDate = new Date()
+
+  // Get the birthday date
+  const birthdayDate = new Date(birthDay)
+
+  // Calculate the age
+  const age = currentDate.getFullYear() - birthdayDate.getFullYear()
+
+  const month = currentDate.getMonth() - birthdayDate.getMonth()
+  if (
+    month < 0 ||
+    (month === 0 && currentDate.getDate() < birthdayDate.getDate())
+  ) {
+    age--
+  }
+
+  // Return the age
+  return age
+}
